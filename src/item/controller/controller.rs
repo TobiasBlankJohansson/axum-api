@@ -1,6 +1,6 @@
 use axum::extract::State;
 use axum::Json;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::item::model::item::Item;
@@ -13,9 +13,17 @@ pub struct CreateItemRequest{
     storage_area: String
 }
 
+#[derive(Serialize)]
+pub struct ItemDto {
+    id: Uuid,
+    name: String,
+    quantity: i16,
+    storageArea: String
+}
+
 pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
-    let items = Service::get_item_list(&pool);
-    Json(items.await)
+    let items = Service::get_item_list(&pool).await;
+    Json(items)
 }
 
 pub async fn create_item(
