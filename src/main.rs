@@ -2,10 +2,10 @@ mod item;
 
 use std::net::SocketAddr;
 use axum::{Router};
-use axum::routing::get;
+use axum::routing::{get, post};
 use dotenv::dotenv;
 use item::database::database::establish_connection;
-use crate::item::controller::controller::get_items;
+use crate::item::controller::controller::{create_item, get_items};
 
 #[tokio::main]
 async fn main() {
@@ -14,6 +14,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/items",get(get_items))
+        .route("/api/items",post(create_item))
         .with_state(pool);
 
     let addr = SocketAddr::from(([127,0,0,1],3000));
