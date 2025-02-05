@@ -1,10 +1,11 @@
 use sqlx::PgPool;
+use crate::item::model::item::Item;
 use crate::item::repository::repository::Repository;
 
 pub struct Service;
 
 impl Service {
-    fn get_item_list(pool: &PgPool){
+    pub fn get_item_list(pool: &PgPool) -> Vec<Item>{
         Repository::inventory_list(pool)
     }
 }
