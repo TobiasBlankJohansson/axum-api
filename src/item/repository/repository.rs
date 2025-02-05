@@ -12,7 +12,7 @@ impl Repository {
     }
 
     pub async fn get_item_by_id(pool: &PgPool, id: Uuid) -> Item {
-        sqlx::query_as::<_, Item>("SELECT * WHERE id = %1")
+        sqlx::query_as::<_, Item>("SELECT * FROM inventory WHERE id = $1")
             .bind(id)
             .fetch_one(pool)
             .await
