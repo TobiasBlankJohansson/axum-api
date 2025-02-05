@@ -6,5 +6,5 @@ use crate::item::service::service::Service;
 
 pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
     let items = Service::get_item_list(&pool);
-    Json(items)
+    Json(items.await)
 }

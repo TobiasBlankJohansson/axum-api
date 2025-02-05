@@ -1,8 +1,7 @@
 mod item;
 
 use std::net::SocketAddr;
-use axum::handler::Handler;
-use axum::{Router, ServiceExt};
+use axum::{Router};
 use axum::routing::get;
 use dotenv::dotenv;
 use item::database::database::establish_connection;
