@@ -29,8 +29,19 @@ impl Repository {
             .unwrap()
     }
 
-    pub async fn delete_item(pool: &PgPool, id: Uuid){
+    pub async fn delete_item(pool: &PgPool, id: Uuid) {
         sqlx::query::<_>("DELETE FROM inventory WHERE id = $1")
+            .bind(id)
+            .execute(pool)
+            .await
+            .unwrap();
+    }
+
+    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) {
+        sqlx::query::<_>("UPDATE inventory SET name = $1, quantity = $2, storage_area = $3 WHERE id = $4")
+            .bind(name)
+            .bind(quantity)
+            .bind(storage_area)
             .bind(id)
             .execute(pool)
             .await
