@@ -1,4 +1,4 @@
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::Json;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -20,10 +20,24 @@ pub struct ItemDto {
     quantity: i16,
     storageArea: String
 }
+impl ItemDto{
+    pub fn to_model(item: Item) -> ItemDto{
+        ItemDto{
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            storageArea: item.storage_area
+        }
+    }
+}
 
 pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
     let items = Service::get_item_list(&pool).await;
     Json(items)
+}
+
+pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> ItemDto{
+
 }
 
 pub async fn create_item(
