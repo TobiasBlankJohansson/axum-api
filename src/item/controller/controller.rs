@@ -39,9 +39,9 @@ impl ItemDto{
     }
 }
 
-pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
+pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<ItemDto>>{
     let items = Service::get_item_list(&pool).await;
-    Json(items)
+    Json(ItemDto::to_model_list(items))
 }
 
 pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Json<ItemDto>{
