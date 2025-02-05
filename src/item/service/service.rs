@@ -1,3 +1,4 @@
+use std::sync::PoisonError;
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::item::model::item::Item;
@@ -20,5 +21,9 @@ impl Service {
 
     pub async fn delete_item(pool: &PgPool, id: Uuid) {
         Repository::delete_item(pool, id).await
+    }
+
+    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) {
+        Repository::update_item(pool, id, name, quantity, storage_area).await
     }
 }
