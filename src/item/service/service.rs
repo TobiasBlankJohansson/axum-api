@@ -17,4 +17,8 @@ impl Service {
     pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) -> Uuid {
         Repository::create_item(pool, name, quantity, storage_area).await
     }
+
+    pub async fn delete_item(pool: &PgPool, id: Uuid) {
+        Repository::delete_item(pool, id).await
+    }
 }
