@@ -30,9 +30,10 @@ impl Repository {
     }
 
     pub async fn delete_item(pool: &PgPool, id: Uuid){
-        sqlx::query::<_>("DELETE FROM inventory WHERE id = $s").bind(id)
-            .fetch(pool)
+        sqlx::query::<_>("DELETE FROM inventory WHERE id = $1")
+            .bind(id)
+            .execute(pool)
             .await
-            .unwrap()
+            .unwrap();
     }
 }
