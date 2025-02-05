@@ -29,6 +29,14 @@ impl ItemDto{
             storageArea: item.storage_area
         }
     }
+
+    pub fn to_model_list(items: Vec<Item>) -> Vec<ItemDto>{
+        let mut item_dto:Vec<ItemDto> = Vec::new();
+        for item in items {
+            item_dto.push(ItemDto::to_model(item))
+        }
+        item_dto
+    }
 }
 
 pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
