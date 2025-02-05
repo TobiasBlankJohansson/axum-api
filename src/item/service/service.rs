@@ -1,4 +1,3 @@
-use std::sync::PoisonError;
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::item::model::item::Item;
