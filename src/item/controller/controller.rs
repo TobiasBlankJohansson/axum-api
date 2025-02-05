@@ -2,6 +2,7 @@ use axum::extract::State;
 use axum::Json;
 use serde::Deserialize;
 use sqlx::PgPool;
+use uuid::Uuid;
 use crate::item::model::item::Item;
 use crate::item::service::service::Service;
 
@@ -19,7 +20,7 @@ pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<Item>>{
 
 pub async fn create_item(
     State(pool): State<PgPool>,
-    Json(body): Json<CreateItemRequest>) -> uuid {
+    Json(body): Json<CreateItemRequest>) -> Json<Uuid> {
     let item_uuid = Service::create_item(&pool, &body.name, &body.quantity, &body.storage_area).await;
     Json(item_uuid)
 }

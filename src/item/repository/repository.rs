@@ -11,8 +11,8 @@ impl Repository {
             .unwrap()
     }
 
-    pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) -> uuid {
-        sqlx::query_as::<_, uuid>("INSERT INTO inventory (name,quantity,storage_area) VALUES ($1,$2,$3) RETURNING id")
+    pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) -> Uuid {
+        sqlx::query_scalar::<_, Uuid>("INSERT INTO inventory (name,quantity,storage_area) VALUES ($1,$2,$3) RETURNING id")
             .bind(name)
             .bind(quantity)
             .bind(storage_area)
