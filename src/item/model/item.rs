@@ -6,6 +6,6 @@ use uuid::Uuid;
 pub struct Item{
     pub id: Uuid,
     pub name: String,
-    pub quantity: i32,
+    pub quantity: i16,
     pub storage_area: String
 }
