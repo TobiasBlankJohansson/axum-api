@@ -3,10 +3,7 @@ mod item;
 use std::net::SocketAddr;
 use axum::handler::Handler;
 use axum::{Router, ServiceExt};
-use axum::routing::Route;
 use dotenv::dotenv;
-use sqlx::Any;
-use tower_http::cors::CorsLayer;
 use item::database::database::establish_connection;
 
 #[tokio::main]
