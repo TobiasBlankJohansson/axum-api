@@ -35,3 +35,11 @@ pub async fn delete_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> im
     Service::delete_item(&pool, id).await;
     StatusCode::NO_CONTENT
 }
+
+pub async fn update_item(
+    State(pool): State<PgPool>,
+    Path(id): Path<Uuid>,
+    Json(body): Json<CreateItemRequest>) -> impl IntoResponse {
+    Service::update_item(&pool, id, &body.name, &body.quantity, &body.storage_area).await;
+    StatusCode::NO_CONTENT
+}
