@@ -18,11 +18,7 @@ impl Repository {
             .await
     }
 
-    pub async fn create_item(
-        pool: &PgPool,
-        name: &String,
-        quantity: &i16,
-        storage_area: &String)
+    pub async fn create_item(pool: &PgPool, name: &str, quantity: &i16, storage_area: &str)
         -> Result<Option<Uuid>, sqlx::Error> {
         sqlx::query_scalar::<_, Uuid>("INSERT INTO inventory (name,quantity,storage_area) VALUES ($1,$2,$3) RETURNING id")
             .bind(name)
@@ -41,7 +37,7 @@ impl Repository {
         Ok(())
     }
 
-    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) -> Result<(), ApiError> {
+    pub async fn update_item(pool: &PgPool, id: Uuid, name: &str, quantity: &i16, storage_area: &str) -> Result<(), ApiError> {
         sqlx::query::<_>("UPDATE inventory SET name = $1, quantity = $2, storage_area = $3 WHERE id = $4")
             .bind(name)
             .bind(quantity)
