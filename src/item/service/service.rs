@@ -7,8 +7,9 @@ use crate::item::repository::repository::Repository;
 pub struct Service;
 
 impl Service {
-    pub async fn get_item_list(pool: &PgPool) -> Vec<Item> {
-        Repository::inventory_list(pool).await?.map_err(ApiError::DatabaseError)
+    pub async fn get_item_list(pool: &PgPool) -> Result<Vec<Item>,ApiError> {
+        let items = Repository::inventory_list(pool).await?;
+        Ok(items)
     }
 
     pub async fn get_item(pool: &PgPool, id: Uuid) -> Item {

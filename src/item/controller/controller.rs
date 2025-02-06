@@ -1,11 +1,12 @@
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
+use axum::http::{Response, StatusCode};
 use axum::Json;
 use axum::response::IntoResponse;
 use serde::{Deserialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::item::controller::dto::item_dto::ItemDto;
+use crate::item::error_handler::error_handler::ApiError;
 use crate::item::service::service::Service;
 
 #[derive(Deserialize)]
@@ -15,9 +16,9 @@ pub struct CreateItemRequest{
     storage_area: String
 }
 
-pub async fn get_items(State(pool): State<PgPool>) -> Json<Vec<ItemDto>>{
-    let items = Service::get_item_list(&pool).await;
-    Json(ItemDto::to_model_list(items))
+pub async fn get_items(State(pool): State<PgPool>) -> Result<Json<Vec<ItemDto>>, ApiError>{
+    let items = Service::get_item_list(&pool).await?;
+    Ok(Json(ItemDto::to_model_list(items)))
 }
 
 pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Json<ItemDto>{
