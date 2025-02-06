@@ -28,9 +28,9 @@ pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Resul
 
 pub async fn create_item(
     State(pool): State<PgPool>,
-    Json(body): Json<CreateItemRequest>) -> Json<Uuid> {
-    let item_uuid = Service::create_item(&pool, &body.name, &body.quantity, &body.storage_area).await;
-    Json(item_uuid)
+    Json(body): Json<CreateItemRequest>) -> Result<Json<Uuid>, ApiError> {
+    let item_uuid = Service::create_item(&pool, &body.name, &body.quantity, &body.storage_area).await?;
+    Ok(Json(item_uuid))
 }
 pub async fn delete_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> impl IntoResponse {
     Service::delete_item(&pool, id).await;
