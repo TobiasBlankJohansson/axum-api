@@ -16,8 +16,9 @@ impl Service {
         Repository::get_item_by_id(pool, id).await?.ok_or(ApiError::NotFound)
     }
 
-    pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) -> Uuid {
-        Repository::create_item(pool, name, quantity, storage_area).await
+    pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) ->  Result<Uuid, ApiError> {
+        Repository::create_item(pool, name, quantity, storage_area).await?
+            .ok_or(ApiError::NotFound)
     }
 
     pub async fn delete_item(pool: &PgPool, id: Uuid) {
