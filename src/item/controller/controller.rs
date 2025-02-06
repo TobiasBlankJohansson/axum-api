@@ -1,4 +1,4 @@
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::http::{StatusCode};
 use axum::Json;
 use axum::response::IntoResponse;
@@ -16,8 +16,8 @@ pub struct CreateItemRequest{
     storage_area: String
 }
 
-pub async fn get_items(State(pool): State<PgPool>) -> Result<Json<Vec<ItemDto>>, ApiError>{
-    let items = Service::get_item_list(&pool).await?;
+pub async fn get_items(State(pool): State<PgPool>, Query(storage_area): Query<String>) -> Result<Json<Vec<ItemDto>>, ApiError>{
+    let items = Service::get_item_list(&pool, storage).await?;
     Ok(Json(ItemDto::to_model_list(items)))
 }
 
