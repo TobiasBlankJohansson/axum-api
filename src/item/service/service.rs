@@ -21,11 +21,11 @@ impl Service {
             .ok_or(ApiError::NotFound)
     }
 
-    pub async fn delete_item(pool: &PgPool, id: Uuid) {
+    pub async fn delete_item(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
         Repository::delete_item(pool, id).await
     }
 
-    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) {
+    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) -> Result<(), ApiError> {
         Repository::update_item(pool, id, name, quantity, storage_area).await
     }
 }
