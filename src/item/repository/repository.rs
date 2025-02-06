@@ -4,11 +4,10 @@ use crate::item::model::item::Item;
 
 pub struct Repository;
 impl Repository {
-    pub async fn inventory_list(pool: &PgPool) -> Vec<Item> {
+    pub async fn inventory_list(pool: &PgPool) -> Result<Vec<Item>,sqlx::Error> {
         sqlx::query_as::<_, Item>("SELECT * From inventory")
             .fetch_all(pool)
             .await
-            .unwrap()
     }
 
     pub async fn get_item_by_id(pool: &PgPool, id: Uuid) -> Item {
