@@ -17,14 +17,18 @@ impl Repository {
             .await
     }
 
-    pub async fn create_item(pool: &PgPool, name: &String, quantity: &i16, storage_area: &String) -> Uuid {
+    pub async fn create_item(
+        pool: &PgPool,
+        name: &String,
+        quantity: &i16,
+        storage_area: &String)
+        -> Result<Option<Uuid>, sqlx::Error> {
         sqlx::query_scalar::<_, Uuid>("INSERT INTO inventory (name,quantity,storage_area) VALUES ($1,$2,$3) RETURNING id")
             .bind(name)
             .bind(quantity)
             .bind(storage_area)
-            .fetch_one(pool)
+            .fetch_optional(pool)
             .await
-            .unwrap()
     }
 
     pub async fn delete_item(pool: &PgPool, id: Uuid) {
