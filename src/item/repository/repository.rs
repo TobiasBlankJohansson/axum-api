@@ -1,5 +1,6 @@
 use sqlx::PgPool;
 use uuid::Uuid;
+use crate::item::error_handler::error_handler::ApiError;
 use crate::item::model::item::Item;
 
 pub struct Repository;
@@ -31,15 +32,16 @@ impl Repository {
             .await
     }
 
-    pub async fn delete_item(pool: &PgPool, id: Uuid) {
+    pub async fn delete_item(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
         sqlx::query::<_>("DELETE FROM inventory WHERE id = $1")
             .bind(id)
             .execute(pool)
             .await
-            .unwrap();
+            .map_err(|e| ApiError::DatabaseError(e))?;
+        Ok(())
     }
 
-    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) {
+    pub async fn update_item(pool: &PgPool, id: Uuid, name: &String, quantity: &i16, storage_area: &String) -> Result<(), ApiError> {
         sqlx::query::<_>("UPDATE inventory SET name = $1, quantity = $2, storage_area = $3 WHERE id = $4")
             .bind(name)
             .bind(quantity)
@@ -47,6 +49,7 @@ impl Repository {
             .bind(id)
             .execute(pool)
             .await
-            .unwrap();
+            .map_err(|e| ApiError::DatabaseError(e))?;
+        Ok(())
     }
 }
