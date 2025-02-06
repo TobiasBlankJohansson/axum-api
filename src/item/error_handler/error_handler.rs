@@ -11,9 +11,6 @@ pub enum ApiError {
 
     #[error("Database error: {0}")]
     DatabaseError(#[from] sqlx::Error),
-
-    #[error("Invalid input: {0}")]
-    ValidationError(String),
 }
 
 impl IntoResponse for ApiError {
@@ -21,7 +18,6 @@ impl IntoResponse for ApiError {
         let (status, error_message) = match self {
             ApiError::NotFound => (StatusCode::NOT_FOUND, "Item not found".to_string()),
             ApiError::DatabaseError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string()),
-            ApiError::ValidationError(msg) => (StatusCode::BAD_REQUEST, msg)
         };
         let body = Json(json!({
             "error": error_message
