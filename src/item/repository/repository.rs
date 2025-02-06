@@ -5,8 +5,10 @@ use crate::item::model::item::Item;
 
 pub struct Repository;
 impl Repository {
-    pub async fn inventory_list(pool: &PgPool) -> Result<Vec<Item>, sqlx::Error> {
-        sqlx::query_as::<_, Item>("SELECT * From inventory")
+    pub async fn inventory_list(pool: &PgPool, storage_area: &str) -> Result<Vec<Item>, sqlx::Error> {
+        let query = format!("%{}%", storage_area);
+        sqlx::query_as::<_, Item>("SELECT * From inventory WHERE storage_area LIKE $1")
+            .bind(query)
             .fetch_all(pool)
             .await
     }

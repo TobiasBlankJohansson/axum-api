@@ -16,8 +16,19 @@ pub struct CreateItemRequest{
     storage_area: String
 }
 
-pub async fn get_items(State(pool): State<PgPool>, Query(storage_area): Query<String>) -> Result<Json<Vec<ItemDto>>, ApiError>{
-    let items = Service::get_item_list(&pool, storage).await?;
+#[derive(Deserialize)]
+pub struct StorageAreaParams {
+    storage_area: Option<String>,
+}
+
+
+pub async fn get_items(State(pool): State<PgPool>, Query(storage_area): Query<StorageAreaParams>)
+    -> Result<Json<Vec<ItemDto>>, ApiError>{
+    let mut items;
+    match storage_area.storage_area {
+        None => {items = Service::get_item_list(&pool, &"").await?;}
+        Some(query) => {items = Service::get_item_list(&pool, &query).await?;}
+    }
     Ok(Json(ItemDto::to_model_list(items)))
 }
 
