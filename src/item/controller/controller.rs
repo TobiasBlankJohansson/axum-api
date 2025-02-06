@@ -21,9 +21,9 @@ pub async fn get_items(State(pool): State<PgPool>) -> Result<Json<Vec<ItemDto>>,
     Ok(Json(ItemDto::to_model_list(items)))
 }
 
-pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Json<ItemDto>{
-    let item = Service::get_item(&pool,id).await;
-    Json(ItemDto::to_model(item))
+pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Result<Json<ItemDto>, ApiError>{
+    let item = Service::get_item(&pool,id).await?;
+    Ok(Json(ItemDto::to_model(item)))
 }
 
 pub async fn create_item(
