@@ -8,8 +8,8 @@ pub struct Service;
 
 impl Service {
 
-    pub async fn get_item_list(pool: &PgPool) -> Result<Vec<Item>,ApiError> {
-        let items = Repository::inventory_list(pool).await?;
+    pub async fn get_item_list(pool: &PgPool, storage_area: &str) -> Result<Vec<Item>,ApiError> {
+        let items = Repository::inventory_list(pool, storage_area).await?;
         Ok(items)
     }
 
