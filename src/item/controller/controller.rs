@@ -21,7 +21,7 @@ pub async fn router() -> OpenApiRouter {
 
 #[utoipa::path(
     get,
-    path = "/items",
+    path = "",
     params(StorageAreaParams),
     responses(
         (status = 200, description = "List all items", body = [ItemDto]),
@@ -39,7 +39,7 @@ pub async fn get_items(State(pool): State<Arc<PgPool>>, Query(storage_area): Que
 
 #[utoipa::path(
     get,
-    path = "/items/{id}",
+    path = "/{id}",
     params(("id" = Uuid, Path, description = "Item ID")),
     responses(
         (status = 200, description = "Get a specific item", body = ItemDto),
@@ -53,7 +53,7 @@ pub async fn get_item(State(pool): State<Arc<PgPool>>, Path(id): Path<Uuid>) -> 
 
 #[utoipa::path(
     post,
-    path = "/items",
+    path = "",
     request_body = CreateItemRequest,
     responses(
         (status = 201, description = "Item created", body = Uuid),
@@ -67,7 +67,7 @@ pub async fn create_item(State(pool): State<Arc<PgPool>>, Json(body): Json<Creat
 
 #[utoipa::path(
     delete,
-    path = "/items/{id}",
+    path = "/{id}",
     params(("id" = Uuid, Path, description = "Item ID")),
     responses(
         (status = 204, description = "Item deleted"),
@@ -81,7 +81,7 @@ pub async fn delete_item(State(pool): State<Arc<PgPool>>, Path(id): Path<Uuid>) 
 
 #[utoipa::path(
     put,
-    path = "/items/{id}",
+    path = "/{id}",
     params(("id" = Uuid, Path, description = "Item ID")),
     request_body = CreateItemRequest,
     responses(
@@ -101,7 +101,7 @@ pub async fn update_item(
 #[derive(OpenApi)]
 #[openapi(
     tags(
-        (name = "Items", description = "Operations related to items")
+        (name = "Inventory", description = "Operations related to inventory")
     )
 )]
 pub struct ApiDoc;

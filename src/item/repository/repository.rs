@@ -1,6 +1,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
-use crate::item::error_handler::error_handler::{ApiError, DatabaseErrorDetails};
+use crate::item::error_handler::database_error_details::DatabaseErrorDetails;
+use crate::item::error_handler::error_handler::{ApiError};
 use crate::item::model::item::Item;
 
 pub struct Repository;
