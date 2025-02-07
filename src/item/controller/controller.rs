@@ -7,6 +7,7 @@ use utoipa::{ToSchema, OpenApi, IntoParams};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use crate::item::controller::dto::item_dto::ItemDto;
+use crate::item::controller::dto::create_item_request_dto::{CreateItemRequestDto};
 use crate::item::database::database::establish_connection;
 use crate::item::error_handler::error_handler::ApiError;
 use crate::item::service::service::Service;
@@ -54,14 +55,14 @@ pub async fn get_item(State(pool): State<Arc<PgPool>>, Path(id): Path<Uuid>) -> 
 #[utoipa::path(
     post,
     path = "",
-    request_body = CreateItemRequest,
+    request_body = CreateItemRequestDto,
     responses(
         (status = 201, description = "Item created", body = Uuid),
         (status = 400, description = "Bad request", body = ApiError)
     )
 )]
-pub async fn create_item(State(pool): State<Arc<PgPool>>, Json(body): Json<CreateItemRequest>) -> Result<Json<Uuid>, ApiError> {
-    let item_uuid = Service::create_item(&pool, &body.name, &body.quantity, &body.storage_area).await?;
+pub async fn create_item(State(pool): State<Arc<PgPool>>, Json(body): Json<CreateItemRequestDto>) -> Result<Json<Uuid>, ApiError> {
+    let item_uuid = Service::create_item(&pool, &body.name(), &body.quantity(), &body.storage_area()).await?;
     Ok(Json(item_uuid))
 }
 
@@ -83,7 +84,7 @@ pub async fn delete_item(State(pool): State<Arc<PgPool>>, Path(id): Path<Uuid>) 
     put,
     path = "/{id}",
     params(("id" = Uuid, Path, description = "Item ID")),
-    request_body = CreateItemRequest,
+    request_body = CreateItemRequestDto,
     responses(
         (status = 204, description = "Item updated"),
         (status = 404, description = "Item not found", body = ApiError)
@@ -92,9 +93,9 @@ pub async fn delete_item(State(pool): State<Arc<PgPool>>, Path(id): Path<Uuid>) 
 pub async fn update_item(
     State(pool): State<Arc<PgPool>>,
     Path(id): Path<Uuid>,
-    Json(body): Json<CreateItemRequest>,
+    Json(body): Json<CreateItemRequestDto>,
 ) -> Result<impl IntoResponse, ApiError> {
-    Service::update_item(&pool, id, &body.name, &body.quantity, &body.storage_area).await?;
+    Service::update_item(&pool, id, &body.name(), &body.quantity(), &body.storage_area()).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -106,12 +107,6 @@ pub async fn update_item(
 )]
 pub struct ApiDoc;
 
-#[derive(Deserialize, Serialize, ToSchema)]
-pub struct CreateItemRequest {
-    name: String,
-    quantity: i16,
-    storage_area: String,
-}
 
 #[derive(Deserialize, Serialize, ToSchema, IntoParams)]
 pub struct StorageAreaParams {
