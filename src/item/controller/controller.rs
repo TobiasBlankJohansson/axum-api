@@ -7,18 +7,6 @@ use crate::item::controller::dto::item_dto::ItemDto;
 use crate::item::error_handler::error_handler::ApiError;
 use crate::item::service::service::Service;
 
-#[derive(Deserialize, Serialize, ToSchema)]
-pub struct CreateItemRequest {
-    name: String,
-    quantity: i16,
-    storage_area: String,
-}
-
-#[derive(Deserialize, Serialize, ToSchema, IntoParams)]
-pub struct StorageAreaParams {
-    storage_area: Option<String>,
-}
-
 #[utoipa::path(
     get,
     path = "/items",
@@ -100,10 +88,20 @@ pub async fn update_item(
 
 #[derive(OpenApi)]
 #[openapi(
-    paths(get_items, get_item, create_item, delete_item, update_item),
-    components(schemas(CreateItemRequest, StorageAreaParams, ItemDto, ApiError)),
     tags(
         (name = "Items", description = "Operations related to items")
     )
 )]
 pub struct ApiDoc;
+
+#[derive(Deserialize, Serialize, ToSchema)]
+pub struct CreateItemRequest {
+    name: String,
+    quantity: i16,
+    storage_area: String,
+}
+
+#[derive(Deserialize, Serialize, ToSchema, IntoParams)]
+pub struct StorageAreaParams {
+    storage_area: Option<String>,
+}

@@ -1,12 +1,16 @@
 mod item;
 
 use std::net::SocketAddr;
-use axum::{Router};
-use axum::routing::{delete, get, post, put};
+use std::sync::Arc;
 use dotenv::dotenv;
+use tokio::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
+use utoipa::OpenApi;
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::routes;
+use utoipa_swagger_ui::SwaggerUi;
 use item::database::database::establish_connection;
-use crate::item::controller::controller::{create_item, delete_item, get_item, get_items, update_item};
+use crate::item::controller::controller::{create_item, delete_item, get_item, get_items, update_item, ApiDoc};
 
 #[tokio::main]
 async fn main() {
@@ -17,13 +21,21 @@ async fn main() {
 
     let pool = establish_connection().await;
 
-    let app = Router::new()
-        .route("/api/items", get(get_items))
-        .route("/api/items/:id", get(get_item))
-        .route("/api/items", post(create_item))
-        .route("/api/items/:id", delete(delete_item))
-        .route("/api/items/:id", put(update_item))
-        .with_state(pool)
+    type Inventory = Mutex<Vec<pool>>;
+    pub fn router() -> OpenApiRouter {
+        let inventory = Arc::new(Inventory::default());
+        OpenApiRouter::new()
+            .routes(routes!(get_items, create_item))
+            .routes(routes!(get_item, delete_item, update_item))
+            .with_state(inventory)
+    }
+
+    let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+        .nest("/api/v1/items", router())
+        .split_for_parts();
+
+    let app = router
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", api.clone()))
         .layer(cors);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
