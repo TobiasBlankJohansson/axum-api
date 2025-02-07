@@ -10,7 +10,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use utoipa_swagger_ui::SwaggerUi;
 use item::database::database::establish_connection;
-use crate::item::controller::controller::{create_item, delete_item, get_item, get_items, update_item, ApiDoc};
+use crate::item::controller::controller::{create_item, delete_item, get_item, get_items, router, update_item, ApiDoc};
 
 #[tokio::main]
 async fn main() {
@@ -19,19 +19,9 @@ async fn main() {
     let cors = CorsLayer::new()
         .allow_origin(Any);
 
-    let pool = establish_connection().await;
-
-    type Inventory = Mutex<Vec<pool>>;
-    pub fn router() -> OpenApiRouter {
-        let inventory = Arc::new(Inventory::default());
-        OpenApiRouter::new()
-            .routes(routes!(get_items, create_item))
-            .routes(routes!(get_item, delete_item, update_item))
-            .with_state(inventory)
-    }
 
     let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
-        .nest("/api/v1/items", router())
+        .nest("/api/v1/items", router().await)
         .split_for_parts();
 
     let app = router
