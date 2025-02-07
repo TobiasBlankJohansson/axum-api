@@ -1,32 +1,10 @@
-use std::fmt;
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
 use serde_json::json;
 use thiserror::Error;
 use utoipa::ToSchema;
-use sqlx::Error as SqlxError;
-
-#[derive(Debug, ToSchema)]
-pub struct DatabaseErrorDetails {
-    message: String,
-}
-
-impl From<SqlxError> for DatabaseErrorDetails {
-    fn from(err: SqlxError) -> Self {
-        DatabaseErrorDetails {
-            message: err.to_string(),
-        }
-    }
-}
-
-impl fmt::Display for DatabaseErrorDetails {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Database error: {}", self.message)
-    }
-}
-
-impl std::error::Error for DatabaseErrorDetails {}
+use crate::item::error_handler::database_error_details::DatabaseErrorDetails;
 
 #[derive(Debug, Error, ToSchema)]
 pub enum ApiError {
