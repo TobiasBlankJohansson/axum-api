@@ -1,6 +1,5 @@
 use std::sync::Arc;
 use axum::{extract::{Path, Query, State}, http::StatusCode, Json, response::IntoResponse};
-use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 use utoipa::{ToSchema, OpenApi, IntoParams};

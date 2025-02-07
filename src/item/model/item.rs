@@ -3,7 +3,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Serialize,Deserialize,FromRow)]
-pub struct Item{
+pub struct Item {
     pub id: Uuid,
     pub name: String,
     pub quantity: i16,

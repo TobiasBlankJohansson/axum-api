@@ -26,7 +26,7 @@ impl Repository {
     }
 
     pub async fn create_item(pool: &PgPool, name: &str, quantity: &i16, storage_area: &str)
-        -> Result<Option<Uuid>, ApiError> {
+                             -> Result<Option<Uuid>, ApiError> {
         let items = sqlx::query_scalar::<_, Uuid>("INSERT INTO inventory (name,quantity,storage_area) VALUES ($1,$2,$3) RETURNING id")
             .bind(name)
             .bind(quantity)
