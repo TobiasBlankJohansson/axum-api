@@ -1,8 +1,9 @@
 use serde::Serialize;
+use utoipa::ToSchema;
 use uuid::Uuid;
 use crate::item::model::item::Item;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ItemDto {
     id: Uuid,
     name: String,

@@ -1,57 +1,109 @@
-use axum::extract::{Path, Query, State};
-use axum::http::{StatusCode};
-use axum::Json;
-use axum::response::IntoResponse;
-use serde::{Deserialize};
+use axum::{extract::{Path, Query, State}, http::StatusCode, Json, response::IntoResponse};
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
+use utoipa::{ToSchema, OpenApi, IntoParams};
 use crate::item::controller::dto::item_dto::ItemDto;
 use crate::item::error_handler::error_handler::ApiError;
 use crate::item::service::service::Service;
 
-#[derive(Deserialize)]
-pub struct CreateItemRequest{
+#[derive(Deserialize, Serialize, ToSchema)]
+pub struct CreateItemRequest {
     name: String,
     quantity: i16,
-    storage_area: String
+    storage_area: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, ToSchema, IntoParams)]
 pub struct StorageAreaParams {
     storage_area: Option<String>,
 }
 
-
+#[utoipa::path(
+    get,
+    path = "/items",
+    params(StorageAreaParams),
+    responses(
+        (status = 200, description = "List all items", body = [ItemDto]),
+        (status = 500, description = "Internal Server Error", body = ApiError)
+    )
+)]
 pub async fn get_items(State(pool): State<PgPool>, Query(storage_area): Query<StorageAreaParams>)
-    -> Result<Json<Vec<ItemDto>>, ApiError>{
-    let mut items;
-    match storage_area.storage_area {
-        None => {items = Service::get_item_list(&pool, &"").await?;}
-        Some(query) => {items = Service::get_item_list(&pool, &query).await?;}
-    }
+                       -> Result<Json<Vec<ItemDto>>, ApiError> {
+    let items = match storage_area.storage_area {
+        None => Service::get_item_list(&pool, "").await?,
+        Some(query) => Service::get_item_list(&pool, &query).await?,
+    };
     Ok(Json(ItemDto::to_model_list(items)))
 }
 
-pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Result<Json<ItemDto>, ApiError>{
-    let item = Service::get_item(&pool,id).await?;
+#[utoipa::path(
+    get,
+    path = "/items/{id}",
+    params(("id" = Uuid, Path, description = "Item ID")),
+    responses(
+        (status = 200, description = "Get a specific item", body = ItemDto),
+        (status = 404, description = "Item not found", body = ApiError)
+    )
+)]
+pub async fn get_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Result<Json<ItemDto>, ApiError> {
+    let item = Service::get_item(&pool, id).await?;
     Ok(Json(ItemDto::to_model(item)))
 }
 
-pub async fn create_item(
-    State(pool): State<PgPool>,
-    Json(body): Json<CreateItemRequest>) -> Result<Json<Uuid>, ApiError> {
+#[utoipa::path(
+    post,
+    path = "/items",
+    request_body = CreateItemRequest,
+    responses(
+        (status = 201, description = "Item created", body = Uuid),
+        (status = 400, description = "Bad request", body = ApiError)
+    )
+)]
+pub async fn create_item(State(pool): State<PgPool>, Json(body): Json<CreateItemRequest>) -> Result<Json<Uuid>, ApiError> {
     let item_uuid = Service::create_item(&pool, &body.name, &body.quantity, &body.storage_area).await?;
     Ok(Json(item_uuid))
 }
+
+#[utoipa::path(
+    delete,
+    path = "/items/{id}",
+    params(("id" = Uuid, Path, description = "Item ID")),
+    responses(
+        (status = 204, description = "Item deleted"),
+        (status = 404, description = "Item not found", body = ApiError)
+    )
+)]
 pub async fn delete_item(State(pool): State<PgPool>, Path(id): Path<Uuid>) -> Result<impl IntoResponse, ApiError> {
     Service::delete_item(&pool, id).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    put,
+    path = "/items/{id}",
+    params(("id" = Uuid, Path, description = "Item ID")),
+    request_body = CreateItemRequest,
+    responses(
+        (status = 204, description = "Item updated"),
+        (status = 404, description = "Item not found", body = ApiError)
+    )
+)]
 pub async fn update_item(
     State(pool): State<PgPool>,
     Path(id): Path<Uuid>,
-    Json(body): Json<CreateItemRequest>) -> Result<impl IntoResponse, ApiError> {
+    Json(body): Json<CreateItemRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     Service::update_item(&pool, id, &body.name, &body.quantity, &body.storage_area).await?;
     Ok(StatusCode::NO_CONTENT)
 }
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(get_items, get_item, create_item, delete_item, update_item),
+    components(schemas(CreateItemRequest, StorageAreaParams, ItemDto, ApiError)),
+    tags(
+        (name = "Items", description = "Operations related to items")
+    )
+)]
+pub struct ApiDoc;

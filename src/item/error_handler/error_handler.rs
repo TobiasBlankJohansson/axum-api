@@ -3,8 +3,9 @@ use axum::Json;
 use axum::response::{IntoResponse, Response};
 use serde_json::json;
 use thiserror::Error;
+use utoipa::ToSchema;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, ToSchema)]
 pub enum ApiError {
     #[error("Item not found")]
     NotFound,
