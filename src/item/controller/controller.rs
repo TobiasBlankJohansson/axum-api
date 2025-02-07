@@ -2,7 +2,6 @@ use std::sync::Arc;
 use axum::{extract::{Path, Query, State}, http::StatusCode, Json, response::IntoResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tokio::sync::Mutex;
 use uuid::Uuid;
 use utoipa::{ToSchema, OpenApi, IntoParams};
 use utoipa_axum::router::OpenApiRouter;
@@ -19,7 +18,6 @@ pub async fn router() -> OpenApiRouter {
         .routes(routes!(get_item, delete_item, update_item))
         .with_state(pool)
 }
-
 
 #[utoipa::path(
     get,

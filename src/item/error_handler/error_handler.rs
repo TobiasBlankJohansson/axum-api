@@ -4,6 +4,21 @@ use axum::response::{IntoResponse, Response};
 use serde_json::json;
 use thiserror::Error;
 use utoipa::ToSchema;
+use sqlx::Error as SqlxError;
+
+#[derive(Debug, ToSchema)]
+pub struct DatabaseErrorDetails {
+    message: String,
+}
+
+impl From<SqlxError> for DatabaseErrorDetails {
+    fn from(err: SqlxError) -> Self {
+        DatabaseErrorDetails {
+            message: err.to_string(),
+        }
+    }
+}
+
 
 #[derive(Debug, Error, ToSchema)]
 pub enum ApiError {
@@ -11,7 +26,7 @@ pub enum ApiError {
     NotFound,
 
     #[error("Database error: {0}")]
-    DatabaseError(#[from] sqlx::Error),
+    DatabaseError(#[from] DatabaseErrorDetails),
 }
 
 impl IntoResponse for ApiError {
