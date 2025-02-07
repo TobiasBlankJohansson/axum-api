@@ -8,9 +8,18 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use crate::item::controller::dto::item_dto::ItemDto;
 use crate::item::controller::dto::create_item_request_dto::{CreateItemRequestDto};
+use crate::item::controller::param::storage_area_params::StorageAreaParams;
 use crate::item::database::database::establish_connection;
 use crate::item::error_handler::error_handler::ApiError;
 use crate::item::service::service::Service;
+
+#[derive(OpenApi)]
+#[openapi(
+    tags(
+        (name = "Inventory", description = "Operations related to inventory")
+    )
+)]
+pub struct ApiDoc;
 
 pub async fn router() -> OpenApiRouter {
     let pool = Arc::new(establish_connection().await);
@@ -31,7 +40,7 @@ pub async fn router() -> OpenApiRouter {
 )]
 pub async fn get_items(State(pool): State<Arc<PgPool>>, Query(storage_area): Query<StorageAreaParams>)
                        -> Result<Json<Vec<ItemDto>>, ApiError> {
-    let items = match storage_area.storage_area {
+    let items = match storage_area.storage_area() {
         None => Service::get_item_list(&pool, "").await?,
         Some(query) => Service::get_item_list(&pool, &query).await?,
     };
@@ -97,18 +106,4 @@ pub async fn update_item(
 ) -> Result<impl IntoResponse, ApiError> {
     Service::update_item(&pool, id, &body.name(), &body.quantity(), &body.storage_area()).await?;
     Ok(StatusCode::NO_CONTENT)
-}
-
-#[derive(OpenApi)]
-#[openapi(
-    tags(
-        (name = "Inventory", description = "Operations related to inventory")
-    )
-)]
-pub struct ApiDoc;
-
-
-#[derive(Deserialize, Serialize, ToSchema, IntoParams)]
-pub struct StorageAreaParams {
-    storage_area: Option<String>,
 }
