@@ -1,3 +1,4 @@
+use std::fmt;
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
@@ -19,6 +20,13 @@ impl From<SqlxError> for DatabaseErrorDetails {
     }
 }
 
+impl fmt::Display for DatabaseErrorDetails {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Database error: {}", self.message)
+    }
+}
+
+impl std::error::Error for DatabaseErrorDetails {}
 
 #[derive(Debug, Error, ToSchema)]
 pub enum ApiError {
