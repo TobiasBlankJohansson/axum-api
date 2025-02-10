@@ -35,11 +35,6 @@ spec:
                 configMapKeyRef:
                   name: postgres-config
                   key: postgres-db
-            - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-config
-                  key: postgres-service
 ---
 apiVersion: v1
 kind: Service

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ???
+          image: axum-api:1.0
           ports:
             - containerPort: 3000
           env:
@@ -34,7 +34,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: postgres-config
-                  key: postgres-url
+                  key: postgres-db
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: postgres-host
 ---
 apiVersion: v1
 kind: Service
