@@ -5,7 +5,7 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=inventory_db
+      - POSTGRES_DB=inventory
     volumes:
       - ./data/pgdata:/var/lib/postgresql/data
     ports:
