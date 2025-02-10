@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: postgres-config
 data:
-  mongo-url: postgres-service
+  postgres-db: inventory
+  postgres-host: postgres-service
